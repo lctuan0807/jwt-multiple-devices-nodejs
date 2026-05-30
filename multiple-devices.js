@@ -13,7 +13,7 @@ redis.on('connect', () => {
   console.log('Connected to Redis successfully!');
 });
 
-const JWT_SECRET = 'your_jwt_secret_key';
+const JWT_SECRET = 'jwt_secret_key';
 
 async function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -70,7 +70,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/logout', authenticateToken, async (req, res) => {
-    redis.set(`blacklisted:${req.user.uid}_${req.user.jit}`, 'true', 'EX', 3600); // Set token in Redis with expiration time
+    redis.set(`blacklisted:${req.user.uid}_${req.user.jit}`, 'true'); // Set token in Redis
     res.json({ message: 'Logged out successfully' });
 });
 
@@ -90,6 +90,5 @@ app.post('/change-password', authenticateToken, async (req, res) => {
     await redis.set(invalidationKey, changePasswordDate); // Set invalidation timestamp in Redis
 
     // new pair token and add the current token to blacklist
-
     res.json({ message: 'Password changed successfully' });
 })
